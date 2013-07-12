@@ -62,7 +62,7 @@ class LHCOEvent
             setMET();
         }
         
-        void updateEventID(int eventID, int triggerInfo=1)
+        void setEventID(int eventID, int triggerInfo=1)
         {
             this->eventID=eventID;
             this->triggerInfo=triggerInfo;
@@ -286,6 +286,7 @@ class LHCOEvent
         ~LHCOEvent()
         {
             particleList.clear();
+            delete met;
         }
 };
 
