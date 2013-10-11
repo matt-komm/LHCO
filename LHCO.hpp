@@ -3,6 +3,7 @@
 #include <map>
 #include <iomanip>
 #include <string>
+#include <limits>
 
 class LHCOParticle
 {
@@ -228,7 +229,14 @@ class LHCOEvent
         
         void writeFloat(std::ostream &stream, float value)
         {
-            stream<<std::setw(8)<<std::setprecision(3)<<value;
+            if (std::numeric_limits<float>::max()<=fabs(value))
+            {
+                stream<<std::setw(8)<<std::setprecision(3)<<0.0;
+            }
+            else
+            {
+                stream<<std::setw(8)<<std::setprecision(3)<<value;
+            }
         }
         
         void writeInteger(std::ostream &stream,int value)
