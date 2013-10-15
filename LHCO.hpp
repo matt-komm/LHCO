@@ -3,7 +3,6 @@
 #include <map>
 #include <iomanip>
 #include <string>
-#include <limits>
 
 class LHCOParticle
 {
@@ -40,8 +39,15 @@ class LHCOEvent
         std::map<TYPE,int> types;
         int eventID;
         int triggerInfo;
-        
+        std::string _comment;
         const std::string SEPARATOR;
+        
+        int numPhoton;
+        int numElectron;
+        int numMuon;
+        int numTau;
+        int numJet;
+        int numBJet;
         
         
     public:
@@ -50,7 +56,14 @@ class LHCOEvent
         LHCOEvent(): 
             eventID(1), 
             triggerInfo(1),
-            SEPARATOR(" ")
+            _comment(""),
+            SEPARATOR(" "),
+            numPhoton(0),
+            numElectron(0),
+            numMuon(0),
+            numTau(0),
+            numJet(0),
+            numBJet(0)
         {
             types[PHOTON]=0;
             types[ELECTRON]=1;
@@ -103,6 +116,7 @@ class LHCOEvent
                               float dummy1=0.0,
                               float dummy2=0.0)
         {
+            ++numMuon;
             LHCOParticle* particle = new LHCOParticle();
             particle->type=types[MUON];
             particle->eta=eta;
@@ -126,6 +140,7 @@ class LHCOEvent
                               float dummy1=0.0,
                               float dummy2=0.0)
         {
+            ++numElectron;
             LHCOParticle* particle = new LHCOParticle();
             particle->type=types[ELECTRON];
             particle->eta=eta;
@@ -148,6 +163,7 @@ class LHCOEvent
                               float dummy1=0.0,
                               float dummy2=0.0)
         {
+            ++numPhoton;
             LHCOParticle* particle = new LHCOParticle();
             particle->type=types[PHOTON];
             particle->eta=eta;
@@ -171,6 +187,7 @@ class LHCOEvent
                               float dummy1=0.0,
                               float dummy2=0.0)
         {
+            ++numJet;
             LHCOParticle* particle = new LHCOParticle();
             particle->type=types[JET];
             particle->eta=eta;
@@ -194,6 +211,8 @@ class LHCOEvent
                               float dummy1=0.0,
                               float dummy2=0.0)
         {
+            ++numBJet;
+            ++numJet;
             LHCOParticle* particle = new LHCOParticle();
             particle->type=types[JET];
             particle->eta=eta;
@@ -227,16 +246,14 @@ class LHCOEvent
             return met;
         }
         
+        void setComment(std::string comment)
+        {
+            _comment=comment;
+        }
+        
         void writeFloat(std::ostream &stream, float value)
         {
-            if (std::numeric_limits<float>::max()<=fabs(value))
-            {
-                stream<<std::setw(8)<<std::setprecision(3)<<0.0;
-            }
-            else
-            {
-                stream<<std::setw(8)<<std::setprecision(3)<<value;
-            }
+            stream<<std::setw(8)<<std::setprecision(3)<<value;
         }
         
         void writeInteger(std::ostream &stream,int value)
@@ -273,8 +290,22 @@ class LHCOEvent
            
         }
         
+        void writeSummary(std::ostream &stream)
+        {
+            stream<<"# photons: "<<numPhoton<<"; electrons: "<<numElectron<<"; muons: "<<numMuon<<"; jets: "<<numJet<<"; bjets: "<<numBJet<<std::endl;
+        }
+        
+        void writeComment(std::ostream &stream)
+        {
+            if (_comment!="")
+            {
+                stream<<"# "<<_comment<<std::endl;
+            }
+        }
+        
         void writeEvent(std::ostream &stream)
         {   
+            
             //write out the event id & trigger info
             stream<<std::setw(10)<<std::setprecision(0)<<std::setiosflags(std::ios::left)<<0<<std::resetiosflags(std::ios::left)
                   <<std::setw(10)<<std::setprecision(0)<<std::setiosflags(std::ios::left)<<eventID<<std::resetiosflags(std::ios::left)
